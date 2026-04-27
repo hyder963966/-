@@ -13,6 +13,9 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.13.9'
+      - name: Create local.properties
+        run: |
+          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
       - run: flutter pub get
       - run: flutter build apk --release
       - uses: actions/upload-artifact@v4
