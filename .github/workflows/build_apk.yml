@@ -10,14 +10,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.13.9'
-      - name: Create local.properties
+
+      # الخطوة السحرية: إنشاء هيكل المشروع القياسي ثم نسخ ملفاتنا فوقه
+      - name: Create Android skeleton and sync files
         run: |
-          echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+          cd ..
+          # إنشاء مشروع Flutter مؤقت بنفس اسم المستودع
+          flutter create --project-name pharmacy_app --org com.pharmacy pharmacy_app_new
+          # نسخ مجلد android القياسي إلى مستودعنا
+          cp -r pharmacy_app_new/android .
+          cd -
+
+      - name: Ensure local.properties
+        run: echo "flutter.sdk=$FLUTTER_ROOT" > android/local.properties
+
       - run: flutter pub get
       - run: flutter build apk --release
+
       - uses: actions/upload-artifact@v4
         with:
           name: pharmacy-app-apk
